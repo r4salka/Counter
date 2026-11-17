@@ -3,17 +3,50 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="Counter.Views.CounterPage"
-    Title="Add counter">
+    xmlns:models="clr-namespace:Counter.Models"
+    x:DataType="models:Counter"
+    Title="Counter">
 
     <VerticalStackLayout Padding="30" Spacing="20">
 
-        <Entry
-            x:Name="NameEntry"
-            Placeholder="New counter name" />
+        <Entry x:Name="NameEntry"
+               Text="{Binding Name}"
+               Placeholder="Enter counter name"
+               FontSize="22"
+               HorizontalTextAlignment="Center"/>
 
-        <Button
-            Text="Add counter"
-            Clicked="Add_Clicked" />
+        <Label x:Name="CounterValueLabel"
+               Text="{Binding Value}"
+               FontSize="50"
+               HorizontalOptions="Center"/>
+
+        <Grid ColumnDefinitions="*,*"
+              ColumnSpacing="10">
+
+            <Button Text="+"
+                    Grid.Column="0"
+                    FontSize="25"
+                    Clicked="PlusButton_Clicked"/>
+
+            <Button Text="-"
+                    Grid.Column="1"
+                    FontSize="25"
+                    Clicked="MinusButton_Clicked"/>
+
+        </Grid>
+
+        <Grid ColumnDefinitions="*,*"
+            ColumnSpacing="4">
+
+            <Button Text="{Binding SaveButtonText}" 
+            Grid.Column="0"
+            Clicked="SaveButton_Clicked"/>
+
+            <Button Text="{Binding DeleteButtonText}" 
+            Grid.Column="1"
+            Clicked="DeleteButton_Clicked"/>
+
+        </Grid>
 
     </VerticalStackLayout>
 </ContentPage>

@@ -1,33 +1,97 @@
 ﻿using Counter.Models;
-using Counter.Storage;
+using System.Threading.Tasks;
+using System.IO;
 
-namespace Counter.Views
+namespace Counter.Views;
+[QueryProperty(nameof(ItemId), nameof(ItemId))]
+
+public partial class CounterPage : ContentPage
 {
-    public partial class CounterPage : ContentPage
+
+    public string ItemId
     {
-        public CounterPage()
+        set { LoadCounter(value); }
+    }
+    public CounterPage()
+    {
+        InitializeComponent();
+        string appDataPath = FileSystem.AppDataDirectory;
+        string randomFileName = $"{Path.GetRandomFileName()}.counters.txt";
+
+        LoadCounter(Path.Combine(appDataPath, randomFileName));
+    }
+
+    private void LoadCounter(string fileName)
+    {
+        Models.Counter counterModel = new Models.Counter();
+        counterModel.Filename = fileName;
+        counterModel.Name = "";
+        counterModel.Value = 0;
+
+        if (File.Exists(fileName))
         {
-            InitializeComponent();
+            string[] data = File.ReadAllLines(fileName);
+
+            counterModel.Name = data[0];
+            counterModel.Value = int.Parse(data[1]);
         }
 
-        private async void Add_Clicked(object? sender, EventArgs e)
-        {
-            string name = NameEntry.Text;
+        BindingContext = counterModel;
+    }
 
-            if (string.IsNullOrWhiteSpace(name))
+    private void PlusButton_Clicked(object sender, EventArgs e)
+    {
+        if(BindingContext is Models.Counter counter)
+        {
+            counter.Value++;
+            CounterValueLabel.Text = counter.Value.ToString();
+        }
+    }
+
+    private void MinusButton_Clicked(object sender, EventArgs e)
+    {
+        if (BindingContext is Models.Counter counter)
+        {
+            counter.Value--;
+            CounterValueLabel.Text = counter.Value.ToString();
+        }
+    }
+
+    private async void DeleteButton_Clicked(object sender, EventArgs e)
+    {
+
+        if (BindingContext is Models.Counter counter)
+        {
+            if (File.Exists(counter.Filename))
             {
-                await DisplayAlert("Warning", "Enter a counter name", "OK");
+                File.Delete(counter.Filename);
+            }
+        }
+        await Shell.Current.GoToAsync("..");
+    }
+
+    private async void SaveButton_Clicked(object sender, EventArgs e)
+    {
+        if (BindingContext is Models.Counter counter)
+        {
+            if(string.IsNullOrWhiteSpace(NameEntry.Text))
+            {
+                await DisplayAlert("Error", "Enter counter name", "Ok");
                 return;
             }
 
-            CounterItem newCounter = new CounterItem();
-            newCounter.Name = name;
-            newCounter.Value = 0;
+            counter.Name = NameEntry.Text;
 
-            CounterStorage.counters.Add(newCounter);
-            CounterStorage.SaveCounters();
-
-            await Shell.Current.GoToAsync("..");
+            File.WriteAllLines(counter.Filename, new string[]
+            {
+                counter.Name, 
+                counter.Value.ToString()
+            });
         }
+
+        await Shell.Current.GoToAsync("..");
+
     }
+
+
 }

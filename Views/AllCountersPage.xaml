@@ -3,44 +3,39 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="Counter.Views.AllCountersPage"
+    xmlns:models ="clr-namespace:Counter.Models"
+    x:DataType="models:AllCounters"
     Title="All counters">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="30" Spacing="20">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="{Binding AddButtonText}"
+                 Clicked="Add_Clicked"
+                 IconImageSource="{FontImageSource Glyph='+', Color='Black', Size=22}"/>
+    </ContentPage.ToolbarItems>
 
-            <Button
-                Text="Add counter"
-                Clicked="Add_Clicked" />
+    <CollectionView
+    x:Name="countersCollection"
+    ItemsSource="{Binding Counters}"
+    Margin="20"
+    SelectionMode="Single"
+    SelectionChanged="countersCollection_SelectionChanged">
 
-            <VerticalStackLayout
-                x:Name="CountersLayout"
-                Spacing="20">
+        <CollectionView.ItemsLayout>
+            <LinearItemsLayout Orientation="Vertical"
+                           ItemSpacing="10"/>
+        </CollectionView.ItemsLayout>
 
-                <VerticalStackLayout.Resources>
+        <CollectionView.ItemTemplate>
+            <DataTemplate x:DataType="models:Counter">
+                <StackLayout>
+                    <Label Text="{Binding Name}" 
+                       FontSize="22"/>
+                    <Label Text="{Binding Value}" 
+                       FontSize="14"
+                       TextColor="Silver"/>
+                </StackLayout>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
 
-                    <Style TargetType="Label" x:Key="NameStyle">
-                        <Setter Property="FontSize" Value="20" />
-                        <Setter Property="HorizontalOptions" Value="Center" />
-                    </Style>
-
-                    <Style TargetType="Label" x:Key="ValueStyle">
-                        <Setter Property="FontSize" Value="40" />
-                        <Setter Property="HorizontalOptions" Value="Center" />
-                    </Style>
-
-                    <Style TargetType="HorizontalStackLayout" x:Key="ButtonsStyle">
-                        <Setter Property="Spacing" Value="15" />
-                        <Setter Property="HorizontalOptions" Value="Center" />
-                    </Style>
-
-                    <Style TargetType="VerticalStackLayout" x:Key="CounterStyle">
-                        <Setter Property="Spacing" Value="5" />
-                    </Style>
-
-                </VerticalStackLayout.Resources>
-
-            </VerticalStackLayout>
-
-        </VerticalStackLayout>
-    </ScrollView>
+    </CollectionView>
 </ContentPage>
